@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="入試クイズ">
+<title>静岡県公立高校入試 対策クイズ</title>
+<style>
+:root{--bg:#f2f6f8;--card:#fff;--ink:#1b2a32;--sub:#5b6d77;--ac:#1d6e8c;--on:#fff;--ok:#1b8a4b;--ng:#c0392b;--ln:#cfdbe1;--gr:#e3edf1;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12181c;--card:#1b242a;--ink:#e7eef1;--sub:#93a5ae;--ac:#5cb5d2;--on:#0d1a20;--ok:#5ec98b;--ng:#ef7d6f;--ln:#33424b;--gr:#25313a}}
+:root[data-theme="dark"]{--bg:#12181c;--card:#1b242a;--ink:#e7eef1;--sub:#93a5ae;--ac:#5cb5d2;--on:#0d1a20;--ok:#5ec98b;--ng:#ef7d6f;--ln:#33424b;--gr:#25313a}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Yu Gothic",system-ui,sans-serif;line-height:1.7}
+#app{max-width:560px;margin:0 auto;padding:12px 16px 40px}
+h1{font-size:1.3rem;margin:8px 0}h2{font-size:1.05rem;margin:18px 0 6px}
+.sub{color:var(--sub);margin:12px 0 4px;font-size:.88rem}.note{font-size:.88rem;color:var(--sub)}
+.nav{display:flex;gap:8px}.nav button{flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;border:1.5px solid var(--ln);background:var(--card);color:var(--sub);border-radius:999px;padding:6px 14px;min-height:44px}
+.chip.on{border-color:var(--ac);color:var(--ac);font-weight:700}
+.main,.alt{font:inherit;width:100%;min-height:48px;border-radius:10px;border:1.5px solid var(--ac);padding:10px 16px;font-weight:700;margin-top:12px}
+.main{background:var(--ac);color:var(--on)}.alt{background:transparent;color:var(--ac)}.main:disabled{opacity:.4}
+.card{background-color:var(--card);background-image:linear-gradient(var(--gr) 1px,transparent 1px),linear-gradient(90deg,var(--gr) 1px,transparent 1px);background-size:20px 20px;border:1.5px solid var(--ln);border-radius:10px;padding:16px;margin:12px 0}
+.tag{font-size:.8rem;color:var(--sub);margin:0 0 6px}.q{font-size:1.05rem;margin:0}
+.bar{height:6px;background:var(--gr);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+input,textarea{font:inherit;width:100%;min-height:48px;border:1.5px solid var(--ln);border-radius:10px;padding:8px 12px;background:var(--card);color:var(--ink)}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.opt{display:block;width:100%;text-align:left;font:inherit;min-height:48px;margin-top:8px;padding:10px 14px;border:1.5px solid var(--ln);border-radius:10px;background:var(--card);color:var(--ink)}
+.fb{margin:12px 0 4px;font-weight:700}.ex{margin:0;padding:10px 12px;border-left:4px solid var(--ac);background:var(--card)}
+.good{color:var(--ok)}.bad{color:var(--ng)}.score{font-size:2.2rem;font-weight:700;margin:4px 0}
+table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid var(--ln);padding:6px 4px;text-align:left}
+</style></head><body><div id="app"></div>
+<script>
+const SUB={理科:['物理','化学','生物','地学']};/* 他の教科は、ここに 国語:['漢字・語句','読解'] のように分野を足す */
+const LV=['やさしい','ふつう','むずかしい'];
+/* 問題の追加: 下の形式で1行ずつ足す。[ID,教科,分野,難易度(1-3),年度または「類似問題」,問題文,[正答,...],選択肢(なければ0),単位,解説]  IDは重複させない */
+const D=[
+['r6-1','理科','生物',1,'令和6年度','エンドウの丸形としわ形のように、どちらか一方の形質しか現れない2つの形質どうしを何というか。',['対立形質'],0,'','丸としわのように、どちらか一方しか現れない形質どうしを対立形質という。'],
+['r6-2','理科','生物',1,'令和6年度','ネズミのように、子が親の体内である程度育ってからうまれる子のうまれ方を、一般に何というか。',['胎生'],0,'','子が母親の体内である程度育ってからうまれるふえ方が胎生。卵でうまれるのは卵生。'],
+['r6-3','理科','生物',2,'令和6年度','1日に消費するエネルギー2400kcalのうち20%が脳で消費される。ご飯100gから得られるエネルギーを150kcalとすると、脳の1日の消費エネルギーはご飯何g分か。',['320'],0,'g','脳で使う量は2400×0.2=480kcal。ご飯100gが150kcalなので、480÷150×100=320g。'],
+['r6-4','理科','化学',2,'令和6年度','黒色の酸化銅8.0gと炭素粉末1.5gを混ぜて加熱したところ、反応後の試験管の中の固体は7.3gだった。発生した二酸化炭素は何gか。',['2.2'],0,'g','反応前の合計は8.0+1.5=9.5g。減った分が出ていった二酸化炭素なので、9.5−7.3=2.2g。'],
+['r6-5','理科','地学',1,'令和6年度','地球の自転による、太陽の見かけの動きを何というか。',['日周運動'],0,'','地球の自転による天体の見かけの動きが日周運動。公転によるものは年周運動。'],
+['r6-6','理科','物理',2,'令和6年度','質量3kgの荷物を、定滑車1つを用いて80cmの高さまでゆっくり一定の速さで真上に持ち上げた。手が加えた力がした仕事は何Jか。100gの物体にはたらく重力を1Nとし、摩擦は考えない。',['24'],0,'J','3kgの重力は30N。仕事=力×距離=30N×0.8m=24J。定滑車は力の向きを変えるだけで、力の大きさは変わらない。'],
+['r6-7','理科','物理',2,'令和6年度','1秒に50回打点する記録タイマーで台車の運動を記録した。a点からb点(15打点目)までの長さは22.5cmだった。この間の台車の平均の速さは何cm/sか。',['75'],0,'cm/s','15打点にかかる時間は15÷50=0.3秒。平均の速さ=22.5cm÷0.3s=75cm/s。'],
+['r6-8','理科','物理',3,'令和6年度','定滑車1つの装置で荷物を持ち上げたときと比べ、動滑車を3つ連ねた装置で同じ荷物を同じ高さまで持ち上げると、手が糸を引く力の大きさは何倍になるか。糸や滑車の質量・摩擦は考えない。',['1/8','0.125'],0,'倍','動滑車1つで力は半分(引く距離は2倍)。3つ連ねると力は1/2×1/2×1/2=1/8倍、距離は8倍。仕事の大きさは変わらない(仕事の原理)。'],
+['r7-1','理科','化学',1,'令和7年度','原子が電子を失ったり受けとったりして、＋または－の電気を帯びたものを何というか。',['イオン'],0,'','原子が電子を失うと＋、受けとると－の電気を帯びる。この状態のものをイオンという。'],
+['r7-2','理科','生物',1,'令和7年度','イヌワラビはなかまをふやすために、種子ではなく何をつくるか。',['胞子'],0,'','イヌワラビなどのシダ植物は種子をつくらず、胞子でふえる。'],
+['r7-3','理科','生物',1,'令和7年度','葉の表皮にある、三日月形の2つの細胞に囲まれたすきまを何というか。',['気孔'],0,'','三日月形の2つの孔辺細胞に囲まれたすきまが気孔。気体の出入り口としてはたらく。'],
+['r7-4','理科','地学',1,'令和7年度','恒星が数十億個から数千億個も集まった集団を何というか。',['銀河'],0,'','恒星が数十億〜数千億個集まった集団が銀河。太陽系は天の川銀河(銀河系)にある。'],
+['r7-5','理科','地学',1,'令和7年度','地震で、岩盤の破壊によって大地にできるずれを何というか。',['断層'],0,'','岩盤が破壊されてできた大地のずれが断層。'],
+['r7-6','理科','化学',3,'令和7年度','酸化銀12gを加熱した。試験管の質量は20gで、P班(十分に加熱)は試験管全体が32.0gから31.2gになった。P班でできた銀の質量は、発生した酸素の質量の何倍か。',['14'],0,'倍','酸化銀→銀+酸素。酸素=32.0−31.2=0.8g、銀=12−0.8=11.2g。11.2÷0.8=14倍。'],
+['r7-7','理科','化学',3,'令和7年度','前問の実験で、Q班(加熱が不十分)は試験管全体が32.0gから31.5gになった。Q班の試験管に残った未反応の酸化銀は何gか。',['4.5'],0,'g','発生した酸素は32.0−31.5=0.5g。銀:酸素=14:1なので、反応した酸化銀は酸素の15倍の7.5g。残りは12−7.5=4.5g。'],
+['r7-8','理科','物理',2,'令和7年度','質量120gのおもりを月面に持っていった。月面での重力は地球上の6分の1で、地球上で100gの物体にはたらく重力を1Nとする。月面でおもりにはたらく重力は何Nか。',['0.2'],0,'N','地球上で120gの重力は1.2N。月面では1/6なので1.2÷6=0.2N。(質量は月でも120gのまま)'],
+['r8-1','理科','生物',1,'令和8年度','ヒトの目や耳のような、外界からの刺激を受けとる体の部分を、一般に何というか。',['感覚器官','感覚器'],0,'','光や音などの刺激を受けとる目・耳・鼻・舌・皮膚などを感覚器官という。'],
+['r8-2','理科','物理',3,'令和8年度','100Vの電圧を加えたときの消費電力が10Wの充電器で、スマートフォンに10800Jの電力量を充電する。充電器の消費電力の75%が充電されるとき、かかる時間は何分か。',['24'],0,'分','充電される電力は10W×0.75=7.5W。10800J÷7.5W=1440秒=24分。'],
+['r8-3','理科','生物',1,'令和8年度','細胞の染色体に含まれている、遺伝子の本体の物質を、一般に何というか。',['DNA','デオキシリボ核酸'],0,'','遺伝子の本体はDNA(デオキシリボ核酸)。'],
+['r8-4','理科','化学',1,'令和8年度','石油から粗製ガソリン(ナフサ)をとり出すように、液体を加熱して一度気体にし、その気体を冷やして再び液体にして集める方法を何というか。',['蒸留'],0,'','液体を加熱して気体にし、冷やして液体にして集める方法が蒸留。沸点のちがいを利用して分ける。'],
+['r8-5','理科','化学',1,'令和8年度','次のうち、有機物はどれか。',['メタン'],['食塩','ガラス','硫黄','メタン'],'','炭素をふくむ物質が有機物。メタン(CH₄)は炭素をふくむが、食塩・ガラス・硫黄はふくまない。'],
+['r8-6','理科','化学',3,'令和8年度','水酸化バリウム水溶液100cm³にうすい硫酸を加える。硫酸6cm³のとき沈殿は1.8gで、8cm³で中性になった。硫酸を12cm³加えたとき、沈殿は何gか。',['2.4'],0,'g','混ぜた時点から中和は起こり、中性になる8cm³までは硫酸が全部反応して、沈殿は硫酸の量に比例する。6cm³で1.8gなら1cm³で0.3g、8cm³で2.4g。8cm³を超えた分は反応する相手がないので、12cm³でも2.4gのまま。'],
+['r8-7','理科','地学',1,'令和8年度','火星や地球のような、太陽のまわりを公転している天体を、一般に何というか。',['惑星'],0,'','太陽のまわりを公転する天体が惑星。'],
+['r8-8','理科','物理',1,'令和8年度','太い弦に質量200gのおもりを4個つるした。おもりが弦を引く力の大きさは何Nか。100gの物体にはたらく重力を1Nとする。',['8'],0,'N','おもりの質量は200g×4=800g。100gの重力が1Nなので、800gは8N。'],
+['s-1','理科','化学',3,'類似問題','酸化銀を加熱すると、酸素が0.4g発生した。銀と酸素の質量の比を14:1とすると、できた銀は何gか。',['5.6'],0,'g','銀の質量は酸素の14倍。0.4×14=5.6g。'],
+['s-2','理科','物理',2,'類似問題','動滑車1つを使い、質量2kgの荷物を一定の速さでゆっくり真上に持ち上げる。ひもを引く力は何Nか。100gの重力を1Nとし、滑車やひもの質量・摩擦は考えない。',['10'],0,'N','荷物の重力は20N。動滑車を使うと力は半分になるので、20÷2=10N。(ひもを引く距離は2倍になる)'],
+['s-3','理科','化学',3,'類似問題','水酸化バリウム水溶液にうすい硫酸を加えた。硫酸5cm³のとき沈殿は1.5gで、10cm³で中性になった。硫酸8cm³のとき、沈殿は何gか。',['2.4'],0,'g','中性になる10cm³までは硫酸が全部反応するので、沈殿は硫酸の量に比例する。1.5÷5=0.3g/cm³、0.3×8=2.4g。'],
+['s-4','理科','物理',2,'類似問題','100Vで消費電力20Wの電球を30分間使った。消費した電力量は何Jか。',['36000'],0,'J','電力量=電力×時間。30分=1800秒なので、20W×1800s=36000J。'],
+['s-5','理科','物理',3,'類似問題','1秒に60回打点する記録タイマーで台車の運動を記録した。打点6回ぶんの区間の長さが12cmだった。この区間の平均の速さは何cm/sか。',['120'],0,'cm/s','6打点の時間は6÷60=0.1秒。速さ=12cm÷0.1s=120cm/s。'],
+['s-6','理科','地学',1,'類似問題','マグマが地下深くでゆっくり冷えて固まってできる火成岩を何というか。',['深成岩'],0,'','ゆっくり冷えると結晶が大きく育ち、深成岩になる。地表近くで急に冷えて固まったものは火山岩。'],
+['s-7','理科','生物',1,'類似問題','エンドウの丸(A)としわ(a)で、AAの親とaaの親をかけ合わせた。子の遺伝子の組み合わせはどれか。',['Aa'],['AA','Aa','aa'],'','AAからはA、aaからはaを受けとるので、子はすべてAa。丸が顕性なので、子はすべて丸になる。']
+];
+const $=document.getElementById('app'),K='sk-nyushi-v1';
+let R={log:{}};try{R=JSON.parse(localStorage.getItem(K))||R}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(R))}catch(e){}};
+const C={s:'理科',cat:'すべて',n:5,lv:0,src:new Set(['過去問','類似問題']),m:0,yr:new Set(['令和6年度','令和7年度','令和8年度']),od:0};
+let L=[],i=0,sc=0,miss=[],judged=false,hdn='';
+const nz=s=>s.normalize('NFKC').replace(/[\s、。,]/g,'').toLowerCase().replace(/(cm\/s|cm|g|j|n|分|秒|倍)$/,'');
+const same=(v,a)=>{v=nz(v);return v!==''&&a.some(x=>{x=nz(x);return v===x||(!isNaN(v)&&!isNaN(x)&&+v===+x)})};
+const shuf=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
+const ch=(a,sel,act)=>`<div class="chips">${a.map(([v,l])=>`<button class="chip${sel(v)?' on':''}" data-a="${act}" data-v="${v}">${l}</button>`).join('')}</div>`;
+const o=a=>a.map(x=>[x,x]);
+const nav=t=>`<div class="nav"><button class="chip${t==='q'?' on':''}" data-a="t" data-v="q">出題</button><button class="chip${t==='r'?' on':''}" data-a="t" data-v="r">学習記録</button></div>`;
+const kind=r=>r[4]==='類似問題'?'類似問題':'過去問';
+const pool=()=>D.filter(r=>r[1]===C.s&&(C.cat==='すべて'||r[2]===C.cat)&&(!C.lv||(C.lv===1?r[3]===1:r[3]>=2))&&C.src.has(kind(r))&&(r[4]==='類似問題'||C.yr.has(r[4])));
+function setup(){
+ const p=pool(),n=Math.min(C.n,p.length);
+ $.innerHTML=nav('q')+`<h1>静岡県公立高校入試 対策</h1><p class="sub">教科</p>${ch(o(Object.keys(SUB)),x=>x===C.s,'s')}<p class="sub">分野</p>${ch(o(['すべて',...SUB[C.s]]),x=>x===C.cat,'cat')}<p class="sub">問題数</p>${ch(o([3,5,10]).map(([a,b])=>[a,b+'問']),x=>x==C.n,'n')}<p class="sub">難易度</p>${ch([[0,'全て'],[1,'基礎'],[2,'標準']],x=>x==C.lv,'lv')}<p class="sub">問題の種類</p>${ch([['過去問','過去問'],['類似問題','類似問題(オリジナル)']],x=>C.src.has(x),'src')}<p class="sub">過去問の年度(類似問題には関係しません)</p>${ch(o(['令和6年度','令和7年度','令和8年度']),x=>C.yr.has(x),'yr')}<p class="sub">出題順</p>${ch([[0,'おまかせ(回数の少ない問題を優先)'],[1,'完全シャッフル'],[2,'順番どおり']],x=>x==C.od,'od')}<p class="sub">モード</p>${ch([[0,'短時間(タップ式・紙とペン不要)'],[1,'じっくり(入力式・紙とペンで計算)']],x=>x==C.m,'m')}<p class="note">${p.length?'条件に合う問題: '+p.length+'問'+(p.length<C.n?'。'+C.n+'問に足りないため、'+p.length+'問を出題します。':''):'この条件の問題はまだありません。'}</p><button class="main" data-a="go" ${p.length?'':'disabled'}>はじめる(${n}問)</button>`;
+}
+function begin(rows){L=rows;i=0;sc=0;miss=[];show()}
+function pick(){const p=pool();if(C.od===1)return shuf(p.slice()).slice(0,C.n);if(C.od===2)return p.slice(0,C.n);return shuf(p.map(r=>[((R.log[r[0]]||{}).n||0)+Math.random(),r]).sort((a,b)=>a[0]-b[0]).slice(0,C.n).map(x=>x[1]))}
+const fmt=x=>String(+x.toFixed(2)),terms=()=>D.filter(r=>!r[7]&&isNaN(r[6][0])&&r[6][0]!=='1/8').map(r=>r[6][0]);
+function mk(r){
+ if(r[7])return r[7];const a=r[6][0];let s;
+ if(a==='1/8')return shuf(['1/2','1/4','1/8','1/6']);
+ if(!isNaN(a)){const v=+a;s=new Set([a,fmt(v*2),fmt(v/2),fmt(v*10)]);if(s.size<4)s.add(fmt(v+3))}
+ else s=new Set([a,...shuf(terms().filter(t=>t!==a)).slice(0,3)]);
+ return shuf([...s]);
+}
+function show(){
+ judged=false;const r=L[i],op=C.m?r[7]:mk(r);
+ $.innerHTML=`<div class="bar"><i style="width:${i/L.length*100}%"></i></div><p class="tag">${i+1} / ${L.length}</p><div class="card"><p class="tag">${r[1]}・${r[2]}(${r[4]})</p><p class="q">${r[5]}</p></div>`+(op?op.map(x=>`<button class="opt" data-a="o" data-v="${x}">${x}${r[7]?'':r[8]}</button>`).join(''):`<input id="in" autocomplete="off" placeholder="答えを入力${r[8]?'(単位:'+r[8]+')':''}"><button class="main" data-a="ck">答え合わせ</button>`)+`<div id="fb"></div>`;
+ const f=document.getElementById('in');if(f)f.focus();
+}
+function judge(v,tap){
+ if(judged)return;judged=true;const r=L[i],ok=tap?v===r[6][0]:same(v,r[6]),g=R.log[r[0]]||{n:0,c:0};
+ g.n++;if(ok)g.c++;g.last=ok?1:0;R.log[r[0]]=g;save();
+ if(ok)sc++;else miss.push(r);
+ document.querySelectorAll('input,.opt,[data-a=ck]').forEach(e=>e.disabled=true);
+ document.getElementById('fb').innerHTML=`<p class="fb ${ok?'good':'bad'}">${ok?'正解':'不正解'}　正答: ${r[6][0]}${r[8]}</p>${ok?'':`<p class="note">あなたの答え: ${v}</p>`}<p class="ex">${r[9]}</p><button class="main" data-a="nx">${i+1<L.length?'次の問題':'結果を見る'}</button>`;
+ document.querySelector('[data-a=nx]').focus();
+}
+function result(){
+ $.innerHTML=`<h1>結果</h1><div class="score">${sc} / ${L.length}</div><p>正答率 ${Math.round(sc/L.length*100)}%</p>`+(miss.length?`<h2>間違えた問題</h2>`+miss.map(r=>`<div class="card"><p class="q">${r[5]}</p><p class="fb good">${r[6][0]}${r[8]}</p><p class="ex">${r[9]}</p></div>`).join('')+`<button class="main" data-a="rt">間違えた問題をもう一度解く</button>`:'<p>全問正解です。</p>')+`<button class="alt" data-a="home">最初にもどる</button>`;
+}
+function rec(){
+ let N=0,Cc=0;const bs={},bc={};
+ D.forEach(r=>{const g=R.log[r[0]];if(!g)return;N+=g.n;Cc+=g.c;for(const [b,k] of [[bs,r[1]],[bc,r[1]+'・'+r[2]]]){b[k]=b[k]||[0,0];b[k][0]+=g.n;b[k][1]+=g.c}});
+ const pc=(c,n)=>n?Math.round(c/n*100)+'%':'—',wr=D.filter(r=>(R.log[r[0]]||{}).last===0),wk=Object.entries(bc).filter(e=>e[1][0]>=2).sort((a,b)=>a[1][1]/a[1][0]-b[1][1]/b[1][0]).slice(0,3);
+ $.innerHTML=nav('r')+`<h1>学習記録</h1><p>解いた問題数 <b>${N}</b>　正答率 <b>${pc(Cc,N)}</b></p><h2>教科別の成績</h2><table>${Object.keys(SUB).map(s=>`<tr><td>${s}</td><td>${(bs[s]||[0])[0]}問</td><td>${pc((bs[s]||[0,0])[1],(bs[s]||[0])[0])}</td></tr>`).join('')}</table><h2>苦手分野(2問以上解いた分野)</h2>${wk.length?`<table>${wk.map(([k,v])=>`<tr><td>${k}</td><td>${pc(v[1],v[0])}</td></tr>`).join('')}</table>`:'<p class="note">まだデータが足りません。</p>'}<h2>間違えた問題(${wr.length})</h2>${wr.map(r=>`<p>・${r[5]}<br><b class="good">${r[6][0]}${r[8]}</b></p>`).join('')||'<p class="note">ありません。</p>'}${wr.length?'<button class="main" data-a="redo">間違えた問題を解く</button>':''}<h2>記録の保存について</h2><p class="note">記録はこのiPhoneのSafariの中(localStorage・約5MB)に保存され、ブラウザを閉じても残ります。「履歴とWebサイトデータを消去」すると消えます。プライベートブラウズでは保存されず、長く開かないと自動で消えることもあるため、下のバックアップ文字列をメモなどに保管してください。</p><textarea id="bk" rows="3">${JSON.stringify(R)}</textarea><button class="alt" data-a="imp">この文字列から復元</button><p class="note">${hdn}</p>`;
+}
+$.addEventListener('click',e=>{
+ const t=e.target.closest('button');if(!t||!t.dataset.a)return;const a=t.dataset.a,v=t.dataset.v;
+ if(a==='t')v==='q'?setup():rec();
+ else if(a==='s'){C.s=v;C.cat='すべて';setup()}
+ else if(a==='cat'){C.cat=v;setup()}
+ else if(a==='n'){C.n=+v;setup()}
+ else if(a==='lv'){C.lv=+v;setup()}
+ else if(a==='src'){C.src.has(v)?C.src.delete(v):C.src.add(v);setup()}
+ else if(a==='m'){C.m=+v;setup()}
+ else if(a==='yr'){C.yr.has(v)?C.yr.delete(v):C.yr.add(v);setup()}
+ else if(a==='od'){C.od=+v;setup()}
+ else if(a==='go')begin(pick());
+ else if(a==='ck')judge(document.getElementById('in').value,0);
+ else if(a==='o')judge(v,1);
+ else if(a==='nx'){i++;i<L.length?show():result()}
+ else if(a==='rt')begin(miss.slice());
+ else if(a==='redo')begin(D.filter(r=>(R.log[r[0]]||{}).last===0));
+ else if(a==='home')setup();
+ else if(a==='imp'){try{const x=JSON.parse(document.getElementById('bk').value);if(x&&x.log){R=x;save();hdn='復元しました。';rec()}}catch(er){hdn='復元できませんでした。文字列を確認してください。';rec()}}
+});
+$.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='in'&&e.target.value&&!e.isComposing)judge(e.target.value,0)});
+setup();
+</script></body></html>
