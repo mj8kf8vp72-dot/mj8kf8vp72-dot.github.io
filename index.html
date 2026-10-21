@@ -27,9 +27,13 @@ input:focus,textarea:focus,button:focus-visible{outline:3px solid var(--ac);outl
 .fb{margin:12px 0 4px;font-weight:700}.ex{margin:0;padding:10px 12px;border-left:4px solid var(--ac);background:var(--card)}
 .good{color:var(--ok)}.bad{color:var(--ng)}.score{font-size:2.2rem;font-weight:700;margin:4px 0}
 table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid var(--ln);padding:6px 4px;text-align:left}
+.hero{background:linear-gradient(135deg,var(--ac),#2a8fb0);color:var(--on);border-radius:20px;padding:20px;margin:12px 0}.hero h2{margin:4px 0;font-size:1.3rem;color:inherit}.hero p{margin:0;opacity:.9;font-size:.9rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tile{font:inherit;text-align:left;background:var(--card);border:1.5px solid var(--ln);border-radius:16px;padding:14px;color:var(--ink);min-height:120px}.tile span{font-size:1.6rem}.tile b{display:block;margin:6px 0 2px}.tile small{color:var(--sub)}
+.subs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.sb{font:inherit;background:var(--card);border:1.5px solid var(--ln);border-radius:14px;padding:10px 2px;color:var(--ink);text-align:center;font-size:.8rem}.sb span{display:block;font-size:1.5rem}.sb:disabled{opacity:.45}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.stat div{background:var(--gr);border-radius:12px;padding:10px 4px}.stat b{font-size:1.4rem;display:block}.stat small{color:var(--sub)}
 </style></head><body><div id="app"></div>
 <script>
-const SUB={理科:['物理','化学','生物','地学']};/* 他の教科は、ここに 国語:['漢字・語句','読解'] のように分野を足す */
+const SUB={理科:['物理','化学','生物','地学'],社会:['歴史','地理','公民']};/* 他の教科は、ここに 国語:['漢字・語句','読解'] のように分野を足す */
 const LV=['やさしい','ふつう','むずかしい'];
 /* 問題の追加: 下の形式で1行ずつ足す。[ID,教科,分野,難易度(1-3),年度または「類似問題」,問題文,[正答,...],選択肢(なければ0),単位,解説]  IDは重複させない */
 const D=[
@@ -57,6 +61,33 @@ const D=[
 ['r8-6','理科','化学',3,'令和8年度','水酸化バリウム水溶液100cm³にうすい硫酸を加える。硫酸6cm³のとき沈殿は1.8gで、8cm³で中性になった。硫酸を12cm³加えたとき、沈殿は何gか。',['2.4'],0,'g','混ぜた時点から中和は起こり、中性になる8cm³までは硫酸が全部反応して、沈殿は硫酸の量に比例する。6cm³で1.8gなら1cm³で0.3g、8cm³で2.4g。8cm³を超えた分は反応する相手がないので、12cm³でも2.4gのまま。'],
 ['r8-7','理科','地学',1,'令和8年度','火星や地球のような、太陽のまわりを公転している天体を、一般に何というか。',['惑星'],0,'','太陽のまわりを公転する天体が惑星。'],
 ['r8-8','理科','物理',1,'令和8年度','太い弦に質量200gのおもりを4個つるした。おもりが弦を引く力の大きさは何Nか。100gの物体にはたらく重力を1Nとする。',['8'],0,'N','おもりの質量は200g×4=800g。100gの重力が1Nなので、800gは8N。'],
+['r6-s1','社会','歴史',1,'令和6年度','聖徳太子らが行った政治改革で定められた、天皇の命令に従うことなど、役人の心構えを示した法を何というか。',['十七条の憲法','憲法十七条','十七条憲法'],0,'','604年に聖徳太子が定めた、役人の心構えを示したもの。「和をもって貴しとなす」で始まる。'],
+['r6-s2','社会','歴史',2,'令和6年度','普通選挙法と同じ年に制定された、共産主義や社会運動を取りしまりの対象とした法律を何というか。',['治安維持法'],0,'','1925年、普通選挙法と同時に治安維持法が制定された。選挙権が広がる一方で、社会運動の取りしまりが強められた。'],
+['r6-s3','社会','地理',1,'令和6年度','中部地方にある、飛驒・木曽・赤石の3つの山脈の総称で、ヨーロッパの山脈にちなんだ名前を何というか。',['日本アルプス'],0,'','標高3000m前後の飛驒・木曽・赤石山脈を、ヨーロッパのアルプス山脈にちなんで日本アルプスという。'],
+['r6-s4','社会','地理',1,'令和6年度','施設園芸で、ビニールハウスなどを利用して出荷時期を早める工夫をした栽培方法を何というか。',['促成栽培'],0,'','出荷時期を早める栽培が促成栽培(宮崎県や高知県のピーマン・なすなど)。反対に、遅らせるのが抑制栽培。'],
+['r6-s5','社会','公民',1,'令和6年度','銀行は、融資する相手から返済にあたって(　)を受け取り、預金者に(　)を支払う。その差が銀行の収入になる。(　)に当てはまる語を書きなさい。',['利子','利息'],0,'','銀行は貸した相手から利子(利息)を受け取り、預金者にも利子を払う。貸す側が受け取る利子のほうが高く、その差が収入になる。'],
+['r7-s1','社会','歴史',1,'令和7年度','律令制のもとで、6年ごとにつくられる戸籍に登録された6歳以上の人々にあたえられた田を何というか。',['口分田'],0,'','戸籍に登録された6歳以上の人々に口分田があたえられ、死ぬと国に返された(班田収授法)。'],
+['r7-s2','社会','歴史',2,'令和7年度','鎌倉幕府の執権北条泰時が定めた、武家社会の慣習に基づき政治や裁判の基準などをまとめた法を何というか。',['御成敗式目','貞永式目'],0,'','1232年に北条泰時が定めた、最初の武家法。源頼朝以来の先例や武士の慣習が基準になった。'],
+['r7-s3','社会','地理',1,'令和7年度','四国や本州の南岸に沿って流れていく暖流を何というか。',['黒潮','日本海流'],0,'','日本列島の南岸を北上する暖流が黒潮(日本海流)。日本海側には対馬海流が流れる。'],
+['r7-s4','社会','公民',2,'令和7年度','日本国憲法第9条2項は「陸海空軍その他の(　)は、これを保持しない。」と定めている。(　)に当てはまる語を書きなさい。',['戦力'],0,'','第9条2項は、戦力の不保持と、国の交戦権の否認を定めている。'],
+['r7-s5','社会','公民',1,'令和7年度','道路、公園、学校などのように、人々の生活や産業の基盤となる公共施設を何というか。',['社会資本'],['社会資本','社会福祉','公共事業','公共の福祉'],'','道路・公園・学校・水道などの基盤となる施設が社会資本。社会福祉は、生活を支える制度やサービス。'],
+['r8-s1','社会','歴史',1,'令和8年度','天皇や貴族、農民や防人などが作った歌を収めた歌集で、大伴家持によりまとめられたといわれるものは何か。',['万葉集'],0,'','奈良時代にまとめられた、現存する日本最古の歌集。約4500首の歌が収められている。'],
+['r8-s2','社会','歴史',2,'令和8年度','室町幕府で、将軍の補佐役として置かれ、有力な守護大名が任命された地位を何というか。',['管領'],0,'','管領は将軍を助けて政治を行う役職。細川・斯波・畠山の3氏が交代で任命された。'],
+['r8-s3','社会','地理',1,'令和8年度','志摩半島のように、海岸線が複雑に入り組んだ地形を何というか。',['リアス海岸'],0,'','山地が沈んで谷に海水が入りこんでできた地形。志摩半島のほか、三陸海岸なども代表例。'],
+['r8-s4','社会','地理',1,'令和8年度','ブラジルのように、特定の農産物や鉱産資源の輸出に頼る経済を何というか。',['モノカルチャー経済','モノカルチャー'],0,'','特定の産物の輸出に頼る経済。価格が下がったり、不作になったりすると、収入が不安定になりやすい。'],
+['r8-s5','社会','公民',1,'令和8年度','訪問販売や電話勧誘などの特定の取り引きで商品を購入した場合、一定の期間内であれば契約を解除できる制度を何というか。',['クーリング・オフ','クーリングオフ'],0,'','一定の期間内なら、消費者が一方的に契約を解除できる制度。'],
+['r6-k1','理科','地学',2,'令和6年度','火成岩のうち深成岩ができるときの、マグマの冷え方を、冷える場所とあわせて簡単に書きなさい。',['地下でゆっくり冷える。'],'記述','','深成岩は、マグマが地下深くでゆっくり冷えて固まってできる。(ポイント:地下・ゆっくり)'],
+['r6-k2','理科','地学',2,'令和6年度','寒冷前線付近にできる雲の範囲が、温暖前線付近にできる雲の範囲と比べてせまい理由を、寒気、暖気という2つの言葉を用いて簡単に書きなさい。',['寒気が暖気を押し上げるから。'],'記述','','寒冷前線では、寒気が暖気の下にもぐりこんで暖気を急に押し上げる。(ポイント:寒気が暖気を押し上げる)'],
+['r7-k1','理科','地学',1,'令和7年度','日本の周辺にあるシベリア気団の性質を、温度と湿度に着目して、簡単に書きなさい。',['冷たく乾燥している。'],'記述','','シベリア気団は冬に大陸で発達する。(ポイント:冷たい・乾燥)'],
+['r7-k2','理科','化学',2,'令和7年度','酸化鉄から鉄をとり出すとき、炭素を加えて加熱する理由を、炭素の性質が分かるように簡単に書きなさい。',['炭素は鉄より酸素と結びつきやすいから。'],'記述','','炭素が酸化鉄から酸素をうばい、鉄がとり出される。(ポイント:炭素は鉄より酸素と結びつきやすい)'],
+['r8-k1','理科','地学',2,'令和8年度','天気図で、地表付近にふく風は地点Bのほうが地点Aよりも強かった。その理由を、等圧線の間隔に関連づけて簡単に書きなさい。',['地点Bのほうが等圧線の間隔がせまく、気圧の差が大きかったから。'],'記述','','等圧線の間隔がせまいところほど気圧の差が大きく、風は強くなる。(ポイント:等圧線の間隔がせまい・気圧の差が大きい)'],
+['r8-k2','理科','化学',3,'令和8年度','バイオマスプラスチックを焼却しても大気中の二酸化炭素の増加の原因にならないと考えられる理由を、原料の植物と二酸化炭素の関係が分かるように簡単に書きなさい。',['焼却して出る二酸化炭素は、植物が大気中から吸収したものだから。'],'記述','','植物は成長するときに大気中の二酸化炭素を吸収する。燃やして出る二酸化炭素は、もとは植物が吸収したもの。(ポイント:植物が吸収したもの)'],
+['r6-k3','社会','歴史',2,'令和6年度','織田信長が安土の城下町で座の特権を認めず楽市とした政策には、城下町を発展させるうえで、どのようなねらいがあったか。簡単に書きなさい。',['座の特権を認めず、商工業を活発にさせるため。'],'記述','','座は商工業者の同業組合で、特権をもっていた。楽市は自由な商売を認めて、城下町をにぎわせる政策。(ポイント:商工業を活発にする)'],
+['r6-k4','社会','歴史',2,'令和6年度','1946年に、日本で財閥に対して行われた改革を、簡単に書きなさい。',['経済の支配を強めていた財閥を解体した。'],'記述','','戦後の民主化の一つとして、経済を支配していた財閥が解体された。(ポイント:財閥の解体)'],
+['r7-k3','社会','公民',2,'令和7年度','国が地方交付税交付金を地方公共団体に交付する目的を、簡単に書きなさい。',['地方公共団体間の財政の格差を減らすため。'],'記述','','地域による財源の差を小さくするために、国から交付される。別解:地方公共団体の財源の不足を補うため。'],
+['r7-k4','社会','歴史',3,'令和7年度','1960年代にアメリカ合衆国で盛り上がった公民権運動は、南北戦争後のアフリカ系(黒人)の人々のどのような状況を改善しようとしたか。奴隷制の変化とあわせて、簡単に書きなさい。',['奴隷制は廃止されたが、差別が残っていた状況を改善しようとした。'],'記述','','南北戦争中の奴隷解放宣言で奴隷制は廃止されたが、差別は残っていた。(ポイント:奴隷制は廃止・差別が残る)'],
+['r8-k3','社会','歴史',2,'令和8年度','聖徳太子の時代に定められた冠位十二階の制度は、どのような人材を役人に取り立てる目的で定められたか。それまでとの違いが分かるように、簡単に書きなさい。',['家柄にとらわれず、有能な人を役人に取り立てるため。'],'記述','','冠位十二階は、家柄に関係なく、才能や功績で役人に取り立てるための制度。(ポイント:家柄にとらわれない・有能な人)'],
+['r8-k4','社会','公民',2,'令和8年度','最高裁判所が「憲法の番人」とよばれるのは、どのような権限をもっているからか。簡単に書きなさい。',['法律などが憲法に違反していないかについて、最終的に決定する権限をもっているから。'],'記述','','違憲審査権(法令審査権)をもち、最高裁判所はその最終的な判断をくだす。(ポイント:憲法に違反していないかを最終的に判断)'],
 ['s-1','理科','化学',3,'類似問題','酸化銀を加熱すると、酸素が0.4g発生した。銀と酸素の質量の比を14:1とすると、できた銀は何gか。',['5.6'],0,'g','銀の質量は酸素の14倍。0.4×14=5.6g。'],
 ['s-2','理科','物理',2,'類似問題','動滑車1つを使い、質量2kgの荷物を一定の速さでゆっくり真上に持ち上げる。ひもを引く力は何Nか。100gの重力を1Nとし、滑車やひもの質量・摩擦は考えない。',['10'],0,'N','荷物の重力は20N。動滑車を使うと力は半分になるので、20÷2=10N。(ひもを引く距離は2倍になる)'],
 ['s-3','理科','化学',3,'類似問題','水酸化バリウム水溶液にうすい硫酸を加えた。硫酸5cm³のとき沈殿は1.5gで、10cm³で中性になった。硫酸8cm³のとき、沈殿は何gか。',['2.4'],0,'g','中性になる10cm³までは硫酸が全部反応するので、沈殿は硫酸の量に比例する。1.5÷5=0.3g/cm³、0.3×8=2.4g。'],
@@ -75,9 +106,12 @@ const same=(v,a)=>{v=nz(v);return v!==''&&a.some(x=>{x=nz(x);return v===x||(!isN
 const shuf=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
 const ch=(a,sel,act)=>`<div class="chips">${a.map(([v,l])=>`<button class="chip${sel(v)?' on':''}" data-a="${act}" data-v="${v}">${l}</button>`).join('')}</div>`;
 const o=a=>a.map(x=>[x,x]);
-const nav=t=>`<div class="nav"><button class="chip${t==='q'?' on':''}" data-a="t" data-v="q">出題</button><button class="chip${t==='r'?' on':''}" data-a="t" data-v="r">学習記録</button></div>`;
+const nav=t=>`<div class="nav"><button class="chip" data-a="t" data-v="h">ホーム</button><button class="chip${t==='q'?' on':''}" data-a="t" data-v="q">出題</button><button class="chip${t==='r'?' on':''}" data-a="t" data-v="r">学習記録</button></div>`;
 const kind=r=>r[4]==='類似問題'?'類似問題':'過去問';
 const pool=()=>D.filter(r=>r[1]===C.s&&(C.cat==='すべて'||r[2]===C.cat)&&(!C.lv||(C.lv===1?r[3]===1:r[3]>=2))&&C.src.has(kind(r))&&(r[4]==='類似問題'||C.yr.has(r[4])));
+const MSG=['一問ずつ、できるを増やそう。','今日の1問が、合格への一歩。','昨日より、ひとつ多くできる自分に。','間違えた問題は、伸びしろ。','3問だけでも、立派な勉強。','通学の5分が、力になる。','今日はここまで、でもOK。続けた人が強い。','過去問は、本番のリハーサル。','本番の自分に、自信をプレゼントしよう。','解けなかった問題が、合格を連れてくる。'];
+function home(){let N=0,Cc=0,w=0;D.forEach(r=>{const g=R.log[r[0]];if(!g)return;N+=g.n;Cc+=g.c;if(g.last===0)w++});
+ $.innerHTML=`<h1>静岡高校入試トレーナー</h1><p class="note">過去問 × 類似問題トレーニング</p><div class="hero"><p>YOUR EXAM, YOUR PACE</p><h2>${MSG[Math.floor(Math.random()*MSG.length)]}</h2><p>過去問で実力チェック。類似問題で苦手を克服。</p></div><h2>学習モード</h2><div class="grid2"><button class="tile" data-a="hm" data-v="past"><span>📘</span><b>過去問モード</b><small>年度・教科を選んで演習</small></button><button class="tile" data-a="hm" data-v="sim"><span>✨</span><b>類似問題トレーニング</b><small>分野別の練習問題に挑戦</small></button></div><h2>教科から選ぶ</h2><div class="subs">${[['国語','📖'],['数学','📐'],['英語','🔤'],['理科','🧪'],['社会','🌏']].map(([s,e])=>`<button class="sb" data-a="hs" data-v="${s}" ${SUB[s]?'':'disabled'}><span>${e}</span>${s}${SUB[s]?'':'<br><small>準備中</small>'}</button>`).join('')}</div><h2>学習の記録</h2><div class="card"><div class="stat"><div><b>${N}</b><small>挑戦回数</small></div><div><b>${N?Math.round(Cc/N*100)+'%':'—'}</b><small>全体正答率</small></div><div><b>${w}</b><small>復習候補</small></div></div><button class="alt" data-a="t" data-v="r">学習履歴を見る</button></div>`}
 function setup(){
  const p=pool(),n=Math.min(C.n,p.length);
  $.innerHTML=nav('q')+`<h1>静岡県公立高校入試 対策</h1><p class="sub">教科</p>${ch(o(Object.keys(SUB)),x=>x===C.s,'s')}<p class="sub">分野</p>${ch(o(['すべて',...SUB[C.s]]),x=>x===C.cat,'cat')}<p class="sub">問題数</p>${ch(o([3,5,10]).map(([a,b])=>[a,b+'問']),x=>x==C.n,'n')}<p class="sub">難易度</p>${ch([[0,'全て'],[1,'基礎'],[2,'標準']],x=>x==C.lv,'lv')}<p class="sub">問題の種類</p>${ch([['過去問','過去問'],['類似問題','類似問題(オリジナル)']],x=>C.src.has(x),'src')}<p class="sub">過去問の年度(類似問題には関係しません)</p>${ch(o(['令和6年度','令和7年度','令和8年度']),x=>C.yr.has(x),'yr')}<p class="sub">出題順</p>${ch([[0,'おまかせ(回数の少ない問題を優先)'],[1,'完全シャッフル'],[2,'順番どおり']],x=>x==C.od,'od')}<p class="sub">モード</p>${ch([[0,'短時間(タップ式・紙とペン不要)'],[1,'じっくり(入力式・紙とペンで計算)']],x=>x==C.m,'m')}<p class="note">${p.length?'条件に合う問題: '+p.length+'問'+(p.length<C.n?'。'+C.n+'問に足りないため、'+p.length+'問を出題します。':''):'この条件の問題はまだありません。'}</p><button class="main" data-a="go" ${p.length?'':'disabled'}>はじめる(${n}問)</button>`;
@@ -85,24 +119,25 @@ function setup(){
 function begin(rows){L=rows;i=0;sc=0;miss=[];show()}
 function pick(){const p=pool();if(C.od===1)return shuf(p.slice()).slice(0,C.n);if(C.od===2)return p.slice(0,C.n);return shuf(p.map(r=>[((R.log[r[0]]||{}).n||0)+Math.random(),r]).sort((a,b)=>a[0]-b[0]).slice(0,C.n).map(x=>x[1]))}
 const fmt=x=>String(+x.toFixed(2)),terms=()=>D.filter(r=>!r[7]&&isNaN(r[6][0])&&r[6][0]!=='1/8').map(r=>r[6][0]);
+const DS={'r6-1':['優性形質','潜性形質','純系'],'r6-2':['卵生','変態','有性生殖'],'r6-5':['年周運動','自転','公転'],'r7-1':['電子','陽子','分子'],'r7-2':['花粉','胚珠','子房'],'r7-3':['孔辺細胞','道管','師管'],'r7-4':['星座','星雲','太陽系'],'r7-5':['しゅう曲','隆起','震源'],'r8-1':['感覚神経','中枢神経','運動器官'],'r8-3':['染色体','細胞核','タンパク質'],'r8-4':['ろ過','再結晶','電気分解'],'r8-7':['恒星','衛星','小惑星'],'s-6':['火山岩','堆積岩','凝灰岩'],'r6-s1':['冠位十二階','大宝律令','御成敗式目'],'r6-s2':['普通選挙法','国家総動員法','治安警察法'],'r6-s3':['奥羽山脈','アルプス山脈','ロッキー山脈'],'r6-s4':['抑制栽培','露地栽培','輪作'],'r6-s5':['配当','手数料','税金'],'r7-s1':['荘園','墾田','位田'],'r7-s2':['武家諸法度','大宝律令','建武式目'],'r7-s3':['親潮','対馬海流','リマン海流'],'r7-s4':['軍隊','兵力','武力'],'r8-s1':['古今和歌集','新古今和歌集','日本書紀'],'r8-s2':['執権','老中','守護'],'r8-s3':['フィヨルド','砂浜海岸','三角州'],'r8-s4':['計画経済','市場経済','自給自足経済'],'r8-s5':['製造物責任法','消費者基本法','独占禁止法']};
 function mk(r){
- if(r[7])return r[7];const a=r[6][0];let s;
+ if(r[7])return r[7];const a=r[6][0];let s;if(DS[r[0]])return shuf([a,...DS[r[0]]]);
  if(a==='1/8')return shuf(['1/2','1/4','1/8','1/6']);
  if(!isNaN(a)){const v=+a;s=new Set([a,fmt(v*2),fmt(v/2),fmt(v*10)]);if(s.size<4)s.add(fmt(v+3))}
  else s=new Set([a,...shuf(terms().filter(t=>t!==a)).slice(0,3)]);
  return shuf([...s]);
 }
 function show(){
- judged=false;const r=L[i],op=C.m?r[7]:mk(r);
- $.innerHTML=`<div class="bar"><i style="width:${i/L.length*100}%"></i></div><p class="tag">${i+1} / ${L.length}</p><div class="card"><p class="tag">${r[1]}・${r[2]}(${r[4]})</p><p class="q">${r[5]}</p></div>`+(op?op.map(x=>`<button class="opt" data-a="o" data-v="${x}">${x}${r[7]?'':r[8]}</button>`).join(''):`<input id="in" autocomplete="off" placeholder="答えを入力${r[8]?'(単位:'+r[8]+')':''}"><button class="main" data-a="ck">答え合わせ</button>`)+`<div id="fb"></div>`;
+ judged=false;const r=L[i],kj=r[7]==='記述',op=kj?0:C.m?r[7]:mk(r);
+ $.innerHTML=`<div class="bar"><i style="width:${i/L.length*100}%"></i></div><p class="tag">${i+1} / ${L.length}</p><div class="card"><p class="tag">${r[1]}・${r[2]}(${r[4]})</p><p class="q">${r[5]}</p></div>`+(op?op.map(x=>`<button class="opt" data-a="o" data-v="${x}">${x}${r[7]?'':r[8]}</button>`).join(''):kj?`<textarea id="tx" rows="3" placeholder="答えを書く(紙に書いてもOK)"></textarea><button class="main" data-a="sh">答えを見る</button>`:`<input id="in" autocomplete="off" placeholder="答えを入力${r[8]?'(単位:'+r[8]+')':''}"><button class="main" data-a="ck">答え合わせ</button>`)+`<div id="fb"></div>`;
  const f=document.getElementById('in');if(f)f.focus();
 }
 function judge(v,tap){
- if(judged)return;judged=true;const r=L[i],ok=tap?v===r[6][0]:same(v,r[6]),g=R.log[r[0]]||{n:0,c:0};
+ if(judged)return;judged=true;const r=L[i],ok=tap===2?v:tap?v===r[6][0]:same(v,r[6]),g=R.log[r[0]]||{n:0,c:0};
  g.n++;if(ok)g.c++;g.last=ok?1:0;R.log[r[0]]=g;save();
  if(ok)sc++;else miss.push(r);
  document.querySelectorAll('input,.opt,[data-a=ck]').forEach(e=>e.disabled=true);
- document.getElementById('fb').innerHTML=`<p class="fb ${ok?'good':'bad'}">${ok?'正解':'不正解'}　正答: ${r[6][0]}${r[8]}</p>${ok?'':`<p class="note">あなたの答え: ${v}</p>`}<p class="ex">${r[9]}</p><button class="main" data-a="nx">${i+1<L.length?'次の問題':'結果を見る'}</button>`;
+ document.getElementById('fb').innerHTML=`<p class="fb ${ok?'good':'bad'}">${ok?'正解':'不正解'}　正答: ${r[6][0]}${r[8]}</p>${ok?'':`<p class="note">あなたの答え: ${tap===2?'(自己採点)':v}</p>`}<p class="ex">${r[9]}</p><button class="main" data-a="nx">${i+1<L.length?'次の問題':'結果を見る'}</button>`;
  document.querySelector('[data-a=nx]').focus();
 }
 function result(){
@@ -116,7 +151,9 @@ function rec(){
 }
 $.addEventListener('click',e=>{
  const t=e.target.closest('button');if(!t||!t.dataset.a)return;const a=t.dataset.a,v=t.dataset.v;
- if(a==='t')v==='q'?setup():rec();
+ if(a==='t')v==='h'?home():v==='q'?setup():rec();
+ else if(a==='hm'){C.src=new Set([v==='past'?'過去問':'類似問題']);setup()}
+ else if(a==='hs'){C.s=v;C.cat='すべて';setup()}
  else if(a==='s'){C.s=v;C.cat='すべて';setup()}
  else if(a==='cat'){C.cat=v;setup()}
  else if(a==='n'){C.n=+v;setup()}
@@ -127,13 +164,15 @@ $.addEventListener('click',e=>{
  else if(a==='od'){C.od=+v;setup()}
  else if(a==='go')begin(pick());
  else if(a==='ck')judge(document.getElementById('in').value,0);
+ else if(a==='sh'){const r=L[i];t.disabled=true;document.getElementById('tx').disabled=true;document.getElementById('fb').innerHTML=`<p class="fb">正答例: ${r[6][0]}</p><p class="ex">${r[9]}</p><p class="fb">あなたの答えは合っていましたか?</p><div class="grid2"><button class="main" data-a="sg" data-v="1">合っていた</button><button class="alt" data-a="sg" data-v="0">違っていた</button></div>`}
+ else if(a==='sg')judge(v==='1',2);
  else if(a==='o')judge(v,1);
  else if(a==='nx'){i++;i<L.length?show():result()}
  else if(a==='rt')begin(miss.slice());
  else if(a==='redo')begin(D.filter(r=>(R.log[r[0]]||{}).last===0));
- else if(a==='home')setup();
+ else if(a==='home')home();
  else if(a==='imp'){try{const x=JSON.parse(document.getElementById('bk').value);if(x&&x.log){R=x;save();hdn='復元しました。';rec()}}catch(er){hdn='復元できませんでした。文字列を確認してください。';rec()}}
 });
 $.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='in'&&e.target.value&&!e.isComposing)judge(e.target.value,0)});
-setup();
+home();
 </script></body></html>
